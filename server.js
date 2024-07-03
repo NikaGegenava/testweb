@@ -14,7 +14,7 @@ const ipFilter = (req, res, next) => {
   if (allowedIPs.includes(clientIP)) {
     next();
   } else {
-    res.status(403).send('Access denied');
+    res.redirect('/');
   }
 };
 
