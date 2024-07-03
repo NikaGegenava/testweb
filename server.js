@@ -5,12 +5,12 @@ const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
-const uri = "mongodb+srv://gegenavanika675:<nikagegena123>@mydata.regmol3.mongodb.net/?retryWrites=true&w=majority&appName=MyData";
+const uri = "mongodb+srv://gegenavanika675:nikagegena123123@mydata.regmol3.mongodb.net/?appName=MyData";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const hashedPassword = bcrypt.hashSync(process.env.PASS, 10);
+const hashedPassword = bcrypt.hashSync('admin', 10);
 const users = [
   { id: 1, username: 'admin', password: hashedPassword }
 ];
@@ -27,7 +27,7 @@ const applicantSchema = new mongoose.Schema({
   email: String,
   number: String,
   cv: String,
-  vacancyName: String, 
+  vacancyName: String,
 });
 
 const Applicant = mongoose.model('Applicant', applicantSchema);
@@ -50,7 +50,7 @@ if (!fs.existsSync(dir)) {
 }
 
 app.post('/submit', upload.single('cv'), async (req, res) => {
-  const { firstName, lastName, idNumber, dob, location, email, number, vacancyName } = req.body;
+  const { firstName, lastName, idNumber, dob, location, email, number } = req.body;
   const cv = req.file ? req.file.filename : '';
 
   const newApplicant = new Applicant({
