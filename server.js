@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
-const uri = process.env.DATABASE_URL;;
+const uri = "mongodb+srv://gegenavanika675:<nikagegena123>@mydata.regmol3.mongodb.net/?retryWrites=true&w=majority&appName=MyData";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
