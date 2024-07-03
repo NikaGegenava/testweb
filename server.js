@@ -7,20 +7,6 @@ const multer = require('multer');
 const path = require('path');
 const uri = "mongodb+srv://gegenavanika675:nikagegena123123@mydata.regmol3.mongodb.net/?appName=MyData";
 
-const allowedIP = '178.134.63.32';
-
-const ipFilter = (req, res, next) => {
-  const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-  console.log('Client IP:', clientIP);
-  if (clientIP === allowedIP) {
-    next();
-  } else {
-    console.log('Unauthorized access attempt from IP:', clientIP);
-    res.redirect('/');
-  }
-};
-
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -169,7 +155,5 @@ app.delete('/api/vacancies/:id', async (req, res) => {
   }
 });
 
-app.use('/admin', ipFilter);
-app.use('/admin/main', ipFilter);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
