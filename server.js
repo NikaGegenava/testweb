@@ -7,6 +7,17 @@ const multer = require('multer');
 const path = require('path');
 const uri = "mongodb+srv://gegenavanika675:nikagegena123123@mydata.regmol3.mongodb.net/?appName=MyData";
 
+const allowedIPs = ['178.134.63.32'];
+
+const ipFilter = (req, res, next) => {
+  const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  if (allowedIPs.includes(clientIP)) {
+    next();
+  } else {
+    res.status(403).send('Access denied');
+  }
+};
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -154,5 +165,8 @@ app.delete('/api/vacancies/:id', async (req, res) => {
     res.status(400).json({ error: 'Error deleting vacancy' });
   }
 });
+
+app.use('/admin', ipFilter);
+app.use('/admin/main', ipFilter);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
