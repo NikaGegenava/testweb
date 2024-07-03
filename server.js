@@ -18,6 +18,22 @@ const users = [
 app.use(cors());
 app.use(bodyParser.json());
 
+app.get('/api/check-ip', async (req, res) => {
+  try {
+    const clientIP = req.ip;
+    const allowedIP = '178.134.63.32';
+
+    if (clientIP === allowedIP) {
+      res.status(200).json({ allowed: true });
+    } else {
+      res.status(403).json({ allowed: false });
+    }
+  } catch (error) {
+    console.error('Error fetching IP:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 const applicantSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
@@ -154,6 +170,5 @@ app.delete('/api/vacancies/:id', async (req, res) => {
     res.status(400).json({ error: 'Error deleting vacancy' });
   }
 });
-
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
