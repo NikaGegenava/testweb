@@ -51,7 +51,15 @@ app.get('/api/allowed-ips', (req, res) => {
   res.json({ allowedIPs });
 });
 
-app.use(cors());
+const corsOptions = {
+  origin: 'https://swiftc.ge',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 const applicantSchema = new mongoose.Schema({
