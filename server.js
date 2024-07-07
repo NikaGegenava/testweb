@@ -43,6 +43,11 @@ const sendEmail = async (recipient, subject, content, attachments = []) => {
 const hashedPassword = bcrypt.hashSync(process.env.PASS, 10);
 const users = [{ id: 1, username: process.env.USER, password: hashedPassword }];
 
+app.get('/api/allowed-ips', (req, res) => {
+  const allowedIPs = JSON.parse(process.env.ALLOWED_IPS);
+  res.json({ allowedIPs });
+});
+
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -119,7 +124,7 @@ app.post('/submit', upload.single('cv'), async (req, res) => {
     CV: ${cv}
     Vacancy: ${vacancyName}`;
 
-    await sendEmail(process.env.MAIL, 'New Applicant Submission', emailContent, attachments);
+    await sendEmail('gegenavanika675@gmail.com', 'New Applicant Submission', emailContent, attachments);
     res.status(200).json({ message: 'Applicant submitted successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Error saving applicant' });
@@ -156,7 +161,7 @@ app.post('/upload', upload.array('file', 10), async (req, res) => {
     Service Choice: ${serviceChoice}
     Files: ${files.join(', ')}`;
 
-    await sendEmail(process.env.MAIL, 'New Form Submission', emailContent, attachments);
+    await sendEmail('gegenavanika675@gmail.com', 'New Form Submission', emailContent, attachments);
     res.status(200).json({ message: 'Form data uploaded successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Error saving form data' });
