@@ -44,7 +44,7 @@ const hashedPassword = bcrypt.hashSync(process.env.PASS, 10);
 const users = [{ id: 1, username: process.env.USER, password: hashedPassword }];
 
 const corsOptions = {
-  origin: 'https://swiftc.ge/',
+  origin: 'https://swiftc.ge',
   optionsSuccessStatus: 200,
 };
 
