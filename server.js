@@ -44,7 +44,10 @@ const hashedPassword = bcrypt.hashSync(process.env.PASS, 10);
 const users = [{ id: 1, username: process.env.USER, password: hashedPassword }];
 
 app.get('/api/allowed-ips', (req, res) => {
-  const allowedIPs = JSON.parse(process.env.ALLOWED_IPS);
+  const allowedIPs = [
+    process.env.ALLOWED_IP1
+  ].filter(ip => ip !== undefined);
+
   res.json({ allowedIPs });
 });
 
