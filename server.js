@@ -43,20 +43,9 @@ const sendEmail = async (recipient, subject, content, attachments = []) => {
 const hashedPassword = bcrypt.hashSync(process.env.PASS, 10);
 const users = [{ id: 1, username: process.env.USER, password: hashedPassword }];
 
-app.get('/api/allowed-ips', (req, res) => {
-  const allowedIPs = [
-    process.env.ALLOWED_IP1
-  ].filter(ip => ip !== undefined);
-
-  res.json({ allowedIPs });
-});
-
 const corsOptions = {
-  origin: 'https://swiftc.ge',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
+  origin: 'https://swiftc.ge/',
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
@@ -106,7 +95,7 @@ if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir);
 }
 
-app.post('/submit', upload.single('cv'), async (req, res) => {
+app.post('/submit', upload.single('cv'), cors(corsOptions), async (req, res) => {
   const { firstName, lastName, idNumber, dob, location, email, number, vacancyName } = req.body;
   const cv = req.file ? req.file.filename : '';
 
@@ -142,7 +131,7 @@ app.post('/submit', upload.single('cv'), async (req, res) => {
   }
 });
 
-app.post('/upload', upload.array('file', 10), async (req, res) => {
+app.post('/upload', cors(corsOptions), upload.array('file', 10), async (req, res) => {
   const { name, idNumber, phone, email, manufacturer, model, loan, serviceChoice } = req.body;
   const files = req.files.map(file => file.path);
 
@@ -185,7 +174,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'uploads'));
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', cors(corsOptions), (req, res) => {
   const { username, password } = req.body;
 
   const user = users.find(u => u.username === username);
@@ -220,7 +209,7 @@ const vacancySchema = new mongoose.Schema({
 
 const Vacancy = mongoose.model('Vacancy', vacancySchema);
 
-app.get('/api/vacancies', async (req, res) => {
+app.get('/api/vacancies',cors(corsOptions), async (req, res) => {
   try {
     const vacancies = await Vacancy.find();
     res.json(vacancies);
@@ -229,7 +218,7 @@ app.get('/api/vacancies', async (req, res) => {
   }
 });
 
-app.post('/api/vacancies', async (req, res) => {
+app.post('/api/vacancies',cors(corsOptions), async (req, res) => {
   const { title, description, applyLink } = req.body;
   const newVacancy = new Vacancy({ title, description, applyLink });
   try {
@@ -240,7 +229,7 @@ app.post('/api/vacancies', async (req, res) => {
   }
 });
 
-app.put('/api/vacancies/:id', async (req, res) => {
+app.put('/api/vacancies/:id', cors(corsOptions),async (req, res) => {
   const id = req.params.id;
   const { title, description, applyLink } = req.body;
   try {
@@ -251,7 +240,7 @@ app.put('/api/vacancies/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/vacancies/:id', async (req, res) => {
+app.delete('/api/vacancies/:id', cors(corsOptions),async (req, res) => {
   const id = req.params.id;
   try {
     await Vacancy.findByIdAndDelete(id);
