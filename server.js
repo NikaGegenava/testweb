@@ -43,14 +43,6 @@ const sendEmail = async (recipient, subject, content, attachments = []) => {
 const hashedPassword = bcrypt.hashSync(process.env.PASS, 10);
 const users = [{ id: 1, username: process.env.USER, password: hashedPassword }];
 
-app.get('/api/allowed-ips', cors(corsOptions), (req, res) => {
-  const allowedIPs = [
-    process.env.ALLOWED_IP1,
-  ].filter(ip => ip !== undefined); 
-
-  res.json({ allowedIPs });
-});
-
 const corsOptions = {
   origin: 'https://swiftc.ge/',
   optionsSuccessStatus: 200,
@@ -58,6 +50,14 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
+
+app.get('/api/allowed-ips', cors(corsOptions), (req, res) => {
+  const allowedIPs = [
+    process.env.ALLOWED_IP1,
+  ].filter(ip => ip !== undefined); 
+
+  res.json({ allowedIPs });
+});
 
 const applicantSchema = new mongoose.Schema({
   firstName: String,
