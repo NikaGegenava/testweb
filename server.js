@@ -226,7 +226,10 @@ const vacancySchema = new mongoose.Schema({
 
 const Vacancy = mongoose.model('Vacancy', vacancySchema);
 
-app.get('/api/vacancies',cors(corsOptions), async (req, res) => {
+app.use(cors());
+app.use(bodyParser.json());
+
+app.get('/api/vacancies', async (req, res) => {
   try {
     const vacancies = await Vacancy.find();
     res.json(vacancies);
@@ -235,7 +238,7 @@ app.get('/api/vacancies',cors(corsOptions), async (req, res) => {
   }
 });
 
-app.post('/api/vacancies', cors(corsOptions), async (req, res) => {
+app.post('/api/vacancies', async (req, res) => {
   const { title, description, applyLink, address } = req.body;
   const newVacancy = new Vacancy({ title, description, applyLink, address });
   try {
@@ -246,7 +249,7 @@ app.post('/api/vacancies', cors(corsOptions), async (req, res) => {
   }
 });
 
-app.put('/api/vacancies/:id', cors(corsOptions), async (req, res) => {
+app.put('/api/vacancies/:id', async (req, res) => {
   const id = req.params.id;
   const { title, description, applyLink, address } = req.body;
   try {
@@ -257,7 +260,7 @@ app.put('/api/vacancies/:id', cors(corsOptions), async (req, res) => {
   }
 });
 
-app.delete('/api/vacancies/:id', cors(corsOptions),async (req, res) => {
+app.delete('/api/vacancies/:id', async (req, res) => {
   const id = req.params.id;
   try {
     await Vacancy.findByIdAndDelete(id);
@@ -266,5 +269,4 @@ app.delete('/api/vacancies/:id', cors(corsOptions),async (req, res) => {
     res.status(400).json({ error: 'Error deleting vacancy' });
   }
 });
-
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
