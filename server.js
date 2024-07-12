@@ -249,6 +249,19 @@ app.post('/api/vacancies', async (req, res) => {
   }
 });
 
+app.get('/api/vacancies/:id', cors(corsOptions), async (req, res) => {
+  const { id } = req.params;
+  try {
+    const vacancy = await Vacancy.findById(id);
+    if (!vacancy) {
+      return res.status(404).json({ error: 'Vacancy not found' });
+    }
+    res.json(vacancy);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching vacancy' });
+  }
+});
+
 app.put('/api/vacancies/:id', async (req, res) => {
   const id = req.params.id;
   const { title, description, applyLink, address } = req.body;
@@ -269,4 +282,5 @@ app.delete('/api/vacancies/:id', async (req, res) => {
     res.status(400).json({ error: 'Error deleting vacancy' });
   }
 });
+
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
