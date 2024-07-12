@@ -59,6 +59,14 @@ app.get('/api/allowed-ips', cors(corsOptions), (req, res) => {
   res.json({ allowedIPs });
 });
 
+app.get('/api/allowed-ips2', cors(corsOptions), (req, res) => {
+  const allowedIPs = [
+    process.env.ALLOWED_IP2,
+  ].filter(ip => ip !== undefined); 
+
+  res.json({ allowedIPs2 });
+});
+
 const applicantSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
@@ -213,6 +221,7 @@ const vacancySchema = new mongoose.Schema({
   title: String,
   description: String,
   applyLink: String,
+  address: String
 });
 
 const Vacancy = mongoose.model('Vacancy', vacancySchema);
@@ -226,9 +235,9 @@ app.get('/api/vacancies',cors(corsOptions), async (req, res) => {
   }
 });
 
-app.post('/api/vacancies',cors(corsOptions), async (req, res) => {
-  const { title, description, applyLink } = req.body;
-  const newVacancy = new Vacancy({ title, description, applyLink });
+app.post('/api/vacancies', cors(corsOptions), async (req, res) => {
+  const { title, description, applyLink, address } = req.body;
+  const newVacancy = new Vacancy({ title, description, applyLink, address });
   try {
     await newVacancy.save();
     res.status(201).json(newVacancy);
@@ -237,11 +246,11 @@ app.post('/api/vacancies',cors(corsOptions), async (req, res) => {
   }
 });
 
-app.put('/api/vacancies/:id', cors(corsOptions),async (req, res) => {
+app.put('/api/vacancies/:id', cors(corsOptions), async (req, res) => {
   const id = req.params.id;
-  const { title, description, applyLink } = req.body;
+  const { title, description, applyLink, address } = req.body;
   try {
-    const updatedVacancy = await Vacancy.findByIdAndUpdate(id, { title, description, applyLink }, { new: true });
+    const updatedVacancy = await Vacancy.findByIdAndUpdate(id, { title, description, applyLink, address }, { new: true });
     res.json(updatedVacancy);
   } catch (error) {
     res.status(400).json({ error: 'Error updating vacancy' });
