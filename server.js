@@ -60,7 +60,7 @@ app.get('/api/allowed-ips', cors(corsOptions), (req, res) => {
 });
 
 app.get('/api/allowed-ips2', cors(corsOptions), (req, res) => {
-  const allowedIPs = [
+  const allowedIPs2 = [
     process.env.ALLOWED_IP2,
   ].filter(ip => ip !== undefined); 
 
