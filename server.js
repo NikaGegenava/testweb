@@ -8,17 +8,17 @@ const path = require('path');
 const fs = require('fs');
 var nodemailer = require('nodemailer');
 require('dotenv').config();
-const uri = process.env.DATABASE_URL
+const uri = process.env.DATABASE_URL;
 
 const app = express();
-const PORT = process.env.PORT ;
+const PORT = process.env.PORT;
 
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.AUTHOR,
-    pass: process.env.AUTHORPASS
-  }
+    pass: process.env.AUTHORPASS,
+  },
 });
 
 const sendEmail = async (recipient, subject, content, attachments = []) => {
@@ -32,13 +32,10 @@ const sendEmail = async (recipient, subject, content, attachments = []) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    
   } catch (error) {
-    
+    // Handle error
   }
 };
-
-
 
 const hashedPassword = bcrypt.hashSync(process.env.PASS, 10);
 const users = [{ id: 1, username: process.env.USER, password: hashedPassword }];
@@ -51,19 +48,22 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
-app.get('/api/allowed-ips', cors(corsOptions), (req, res) => {
-  const allowedIPs = [
-    process.env.ALLOWED_IP1,
-  ].filter(ip => ip !== undefined); 
+const allowedDomainMiddleware = (req, res, next) => {
+  const origin = req.headers.origin || req.headers.referer;
+  if (origin && origin.includes('https://swiftc.ge')) {
+    next();
+  } else {
+    res.status(403).json({ error: 'Forbidden' });
+  }
+};
 
+app.get('/api/allowed-ips', allowedDomainMiddleware, cors(corsOptions),(req, res) => {
+  const allowedIPs = [process.env.ALLOWED_IP1].filter(ip => ip !== undefined);
   res.json({ allowedIPs });
 });
 
-app.get('/api/allowed-ips2', cors(corsOptions), (req, res) => {
-  const allowedIPs2 = [
-    process.env.ALLOWED_IP2,
-  ].filter(ip => ip !== undefined); 
-
+app.get('/api/allowed-ips2', allowedDomainMiddleware, cors(corsOptions), (req, res) => {
+  const allowedIPs2 = [process.env.ALLOWED_IP2].filter(ip => ip !== undefined);
   res.json({ allowedIPs2 });
 });
 
@@ -147,7 +147,7 @@ app.post('/submit', upload.single('cv'), cors(corsOptions), async (req, res) => 
   }
 });
 
-app.post('/upload', cors(corsOptions), upload.array('file', 10), async (req, res) => {
+app.post('/upload', cors(corsOptions), allowedDomainMiddleware, upload.array('file', 10), async (req, res) => {
   const { name, idNumber, phone, email, manufacturer, model, loan, serviceChoice } = req.body;
   const files = req.files.map(file => file.path);
 
@@ -190,7 +190,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'uploads'));
 });
 
-app.post('/login', cors(corsOptions), (req, res) => {
+app.post('/login', allowedDomainMiddleware, cors(corsOptions), (req, res) => {
   const { username, password } = req.body;
 
   const user = users.find(u => u.username === username);
@@ -211,25 +211,24 @@ app.post('/login', cors(corsOptions), (req, res) => {
 mongoose.connect(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-}).then(() => {
-  console.log('Connected to MongoDB');
-}).catch(err => {
-  console.error('Error connecting to MongoDB', err);
-});
+})
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch(err => {
+    console.error('Error connecting to MongoDB', err);
+  });
 
 const vacancySchema = new mongoose.Schema({
   title: String,
   description: String,
   applyLink: String,
-  address: String
+  address: String,
 });
 
 const Vacancy = mongoose.model('Vacancy', vacancySchema);
 
-app.use(cors());
-app.use(bodyParser.json());
-
-app.get('/api/vacancies', async (req, res) => {
+app.get('/api/vacancies', cors(corsOptions), allowedDomainMiddleware, async (req, res) => {
   try {
     const vacancies = await Vacancy.find();
     res.json(vacancies);
@@ -238,7 +237,7 @@ app.get('/api/vacancies', async (req, res) => {
   }
 });
 
-app.post('/api/vacancies', async (req, res) => {
+app.post('/api/vacancies', cors(corsOptions), allowedDomainMiddleware, async (req, res) => {
   const { title, description, applyLink, address } = req.body;
   const newVacancy = new Vacancy({ title, description, applyLink, address });
   try {
@@ -249,7 +248,7 @@ app.post('/api/vacancies', async (req, res) => {
   }
 });
 
-app.get('/api/vacancies/:id', cors(corsOptions), async (req, res) => {
+app.get('/api/vacancies/:id', cors(corsOptions), allowedDomainMiddleware, async (req, res) => {
   const { id } = req.params;
   try {
     const vacancy = await Vacancy.findById(id);
@@ -262,7 +261,7 @@ app.get('/api/vacancies/:id', cors(corsOptions), async (req, res) => {
   }
 });
 
-app.put('/api/vacancies/:id', async (req, res) => {
+app.put('/api/vacancies/:id', cors(corsOptions), allowedDomainMiddleware, async (req, res) => {
   const id = req.params.id;
   const { title, description, applyLink, address } = req.body;
   try {
@@ -273,7 +272,7 @@ app.put('/api/vacancies/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/vacancies/:id', async (req, res) => {
+app.delete('/api/vacancies/:id', cors(corsOptions), allowedDomainMiddleware, async (req, res) => {
   const id = req.params.id;
   try {
     await Vacancy.findByIdAndDelete(id);
@@ -281,6 +280,10 @@ app.delete('/api/vacancies/:id', async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: 'Error deleting vacancy' });
   }
+});
+
+app.get('/', (req, res) => {
+  res.status(200).send('Welcome to the API');
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
