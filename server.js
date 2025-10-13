@@ -14,10 +14,12 @@ const app = express();
 const PORT = process.env.PORT;
 
 var transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.mailersend.net',
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.AUTHOR,
-    pass: process.env.AUTHORPASS,
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
   },
 });
 
