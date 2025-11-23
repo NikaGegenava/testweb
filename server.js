@@ -186,8 +186,9 @@ app.post('/upload', cors(corsOptions), allowedDomainMiddleware, upload.array('fi
 
 app.use(express.static(path.join(__dirname, 'uploads')));
 
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'uploads'));
+app.get(/(.*)/, (req, res, next) => {
+    console.log(req.path, req.params);
+    next();
 });
 
 app.post('/login', allowedDomainMiddleware, cors(corsOptions), (req, res) => {
