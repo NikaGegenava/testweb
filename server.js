@@ -209,16 +209,9 @@ app.post('/login', allowedDomainMiddleware, cors(corsOptions), (req, res) => {
   });
 });
 
-mongoose.connect(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => {
-    console.log('Connected to MongoDB');
-  })
-  .catch(err => {
-    console.error('Error connecting to MongoDB', err);
-  });
+mongoose.connect(uri)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('Error connecting to MongoDB', err));
 
 const vacancySchema = new mongoose.Schema({
   title: String,
