@@ -14,12 +14,10 @@ const app = express();
 const PORT = process.env.PORT;
 
 var transporter = nodemailer.createTransport({
-  host: 'smtp.mailersend.net',
-  port: 587,
-  secure: false,
+  service: 'gmail',
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: process.env.AUTHOR,
+    pass: process.env.AUTHORPASS,
   },
 });
 
@@ -187,6 +185,10 @@ app.post('/upload', cors(corsOptions), allowedDomainMiddleware, upload.array('fi
 });
 
 app.use(express.static(path.join(__dirname, 'uploads')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'uploads'));
+});
 
 app.post('/login', allowedDomainMiddleware, cors(corsOptions), (req, res) => {
   const { username, password } = req.body;
